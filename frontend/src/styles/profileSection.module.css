@@ -1,0 +1,91 @@
+.profileContainer {
+    width: 20%;
+    height: auto;
+    background-color: #ffffff;
+    margin: 2px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.containerHeader {
+    text-align: center;
+    width: 100%;
+    border-bottom: 2px solid #000;
+    margin-bottom: 30px;
+}
+
+.containerHeader h2 {
+    margin-left: auto;
+    font-size: 20px;
+    font-weight: bold;
+    color: #171717;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+
+
+.profileInfo h3 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+
+.email {
+  color: #888;
+  margin: 0.25rem 0 1rem;
+}
+
+
+
+.logoutButton {
+  margin-top: 1rem;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-weight: 500;
+}
+
+.logoutButton:hover {
+  background-color: #d32f2f;
+}
+
+.unauthenticatedMessage {
+  text-align: center;
+  color: #666;
+  margin: 1.5rem 0;
+}
+
+.signInButton {
+  background-color: #2196f3;
+  width: 100%;
+  height: 40px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px; 
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.signInButton:hover {
+  background-color: #1976d2;
+}
+
+.errorMessage {
+  color: #f44336;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}

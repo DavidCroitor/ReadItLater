@@ -1,0 +1,131 @@
+.card{
+    background-color:  #fff;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #333;
+    position: relative;
+    z-index: 1;
+}
+
+.card:hover {
+    z-index: 1000;
+    background-color: #f0f0f0;
+    cursor: pointer;
+}
+
+.cardHeader {
+    padding-left: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.categoryName{
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.menuButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #888;
+}
+
+/* Add these new styles */
+.actions {
+    position: relative;
+}
+
+.menu {
+    position: absolute;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+    min-width: 150px;
+    visibility: hidden;
+}
+
+.menuTop {
+    bottom: 100%;
+    margin-bottom: 5px;
+}
+
+.menuBottom {
+    top: 100%;
+    margin-top: 5px;
+}
+
+.menuItem {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.menuItem:hover {
+    background-color: #f5f5f5;
+}
+
+/* Styles for the new category input */
+.newCategoryCard {
+    background-color: white;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #333;
+    padding: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.newCategoryInput {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.newCategoryActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.saveButton, .cancelButton {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.saveButton {
+    background-color: #0070f3;
+    color: white;
+}
+
+.saveButton:hover {
+    background-color: #0060df;
+}
+
+.cancelButton {
+    background-color: #f1f1f1;
+}
+
+.cancelButton:hover {
+    background-color: #e1e1e1;
+}
+
+/* Make the menu visible when open */
+.card:hover .actions.menuOpen .menu {
+    visibility: visible;
+    opacity: 1;
+}

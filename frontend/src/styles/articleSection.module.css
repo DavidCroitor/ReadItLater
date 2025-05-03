@@ -1,0 +1,56 @@
+.categoryContainer {
+    width: 20%;
+    height: auto;
+    background-color: #ffffff;
+    margin: 2px;
+    padding: 20px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+  
+  .containerHeader {
+    text-align: center;
+    width: 100%;
+    border-bottom: 2px solid #000;
+    margin-bottom: 30px;
+  }
+  
+  .articleContainer {
+    width: 60%;
+  }
+  
+  .articleContainer h2 {
+    margin-left: auto;
+    font-size: 20px;
+    font-weight: bold;
+    color: #171717;
+  }
+  
+  .addArticleButton {
+    width: 40px;
+    height: 40px;
+    background-color: #646464;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px; 
+    cursor: pointer;
+  }
+  
+  .addArticle {
+    width: auto;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    color: #a09f9f;
+    margin-bottom: 10px;
+  }
+  
+  .addArticleButton:hover{
+    background-color: #484848;
+  }
+  
+  .addCategory:has(.addCategoryButton:hover){
+    color: #000;
+  }
