@@ -40,7 +40,9 @@ else
     app.UseExceptionHandler("/error");
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
+
+app.UseCors(CorsExtensions.DefaultCorsPolicy);
 
 app.UseAuthentication();
 

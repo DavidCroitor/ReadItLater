@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
+import * as authService from '../services/authService'; // Import your auth service
 
 // Mock user data
 const MOCK_USERS = {
@@ -29,257 +30,152 @@ export default function useProfiles() {
   const [authError, setAuthError] = useState(null);
   
   // Profile state
-  const [profile, setProfile] = useState(null);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileError, setProfileError] = useState(null);
 
-  // Check if there's a saved token in localStorage on initial load
   useEffect(() => {
-    const savedToken = localStorage.getItem('auth_token');
-    const savedUser = localStorage.getItem('auth_user');
-    
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem('token');
+      if(storedToken) {
+        setToken(storedToken);
+        await fetchProfile();
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  // Fetch profile whenever user changes
   useEffect(() => {
-    if (user) {
+    // Only fetch profile if we have a token
+    if (token) {
+      console.log('Token available, fetching profile...');
       fetchProfile();
-    } else {
-      setProfile(null);
     }
+  }, [token]);
+
+  useEffect(() => {
+    console.log('User state updated:', user);
   }, [user]);
 
-  // Login function
-  const login = async (identifier, password) => {
-    setAuthLoading(true);
-    setAuthError(null);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    try {
-      // Find user by email
-      const foundUser = Object.values(MOCK_USERS).find(
-        u => u.email === identifier || u.username === identifier
-      );
-      
-      if (!foundUser || foundUser.password !== password) {
-        throw new Error('Invalid email or password');
-      }
-      
-      // Create mock token
-      const mockToken = `mock-token-${foundUser.id}-${Date.now()}`;
-      
-      // Store in localStorage to persist login
-      localStorage.setItem('auth_token', mockToken);
-      localStorage.setItem('auth_user', JSON.stringify({
-        id: foundUser.id,
-        email: foundUser.email,
-        username: foundUser.username,
-        name: foundUser.name
-      }));
-      
-      // Update state
-      setToken(mockToken);
-      setUser({
-        id: foundUser.id,
-        email: foundUser.email,
-        username: foundUser.username,
-        name: foundUser.name
-      });
-      
-      return { success: true };
-    } catch (error) {
-      setAuthError(error.message);
-      return { success: false, message: error.message };
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-  
-  // Logout function
-  const logout = () => {
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('auth_user');
-    setToken(null);
-    setUser(null);
-    setProfile(null);
-    return { success: true };
-  };
-  
-  // Register function
-  const register = async (username, email, password) => {
-    setAuthLoading(true);
-    setAuthError(null);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    try {
-      // Check if email or username already exists
-      const userExists = Object.values(MOCK_USERS).some(
-        u => u.email === email || u.username === username
-      );
-      
-      if (userExists) {
-        throw new Error('User with this email or username already exists');
-      }
-      
-      // Create new user
-      const newUserId = `user${Object.keys(MOCK_USERS).length + 1}`;
-      const newUser = {
-        id: newUserId,
-        username,
-        email,
-        password,
-        name: username,
-        bio: '',
-        profilePicture: '',
-        savedArticles: []
-      };
-      
-      // Add to mock database
-      MOCK_USERS[newUserId] = newUser;
-      
-      // Auto login after registration
-      return login(email, password);
-    } catch (error) {
-      setAuthError(error.message);
-      return { success: false, message: error.message };
-    } finally {
-      setAuthLoading(false);
-    }
-  };
-  
-  // Fetch user profile
   const fetchProfile = async () => {
-    if (!user || !token) return;
-    
+    if(!token) return;
+
     setProfileLoading(true);
     setProfileError(null);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
+
     try {
-      // Get user data from mock database
-      const userData = MOCK_USERS[user.id];
+      const response = await authService.getUserProfile();
+      setUser(response.data); // Update user state with profile data
+
+    } catch (error) {
+      setProfileError(error.response.data.message || 'Failed to fetch profile');
       
-      if (!userData) {
-        throw new Error('User profile not found');
+      if(error.response?.status === 401) {
+        logout(); 
       }
-      
-      // Create profile object (excluding sensitive data like password)
-      const profileData = {
-        id: userData.id,
-        name: userData.name,
-        username: userData.username,
-        email: userData.email,
-        savedArticles: userData.savedArticles
-      };
-      
-      setProfile(profileData);
-    } catch (error) {
-      setProfileError(error.message);
+
+      return { success: false, error: profileError };
+    
     } finally {
       setProfileLoading(false);
     }
-  };
-  
-  // Update profile
-  const updateProfile = async (profileData) => {
-    if (!user || !token) {
-      return { success: false, message: 'Not authenticated' };
-    }
-    
-    setProfileLoading(true);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    try {
-      // Update data in mock database
-      MOCK_USERS[user.id] = {
-        ...MOCK_USERS[user.id],
-        ...profileData
-      };
-      
-      // Update local profile state
-      setProfile(prev => ({
-        ...prev,
-        ...profileData
-      }));
-      
-      return { success: true };
-    } catch (error) {
-      return { success: false, message: error.message };
-    } finally {
-      setProfileLoading(false);
-    }
-  };
-  
-  // Check if an article is saved by current user
-  const isArticleSaved = (articleId) => {
-    if (!profile) return false;
-    return profile.savedArticles.includes(articleId);
   };
 
-  // Save an article to user profile
-  const saveArticle = async (articleId) => {
-    if (!user || !token) {
-      return { success: false, message: 'Not authenticated' };
+  const login = async (loginIdentifier, password) => {
+    setAuthLoading(true);
+    setAuthError(null);
+
+    try{
+      const response = await authService.login({ loginIdentifier, password });
+      const { accessToken, refreshToken, userDto, accessTokenExpiration } = response.data;
+      
+      setToken(accessToken);
+      setUser(userDto);
+      
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      localStorage.setItem('accessTokenExpiration', accessTokenExpiration);
+
+      return { success: true};
     }
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    try {
-      // Update user's saved articles
-      if (!MOCK_USERS[user.id].savedArticles.includes(articleId)) {
-        MOCK_USERS[user.id].savedArticles.push(articleId);
+    catch (error) {
+      setAuthError(error.response.data.message || 'Login failed');
+      return { success: false, error: authError };
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  const logout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('accessTokenExpiration');
+  };
+
+  const register = async (userData) => {
+    setAuthLoading(true);
+    setAuthError(null);
+
+    try{
+
+      const response = await authService.register({
+        email: userData.email,
+        username: userData.username,
+        password: userData.password,
+        confirmPassword: userData.confirmPassword,
+      });
+      const { accessToken, refreshToken, userDto } = response.data;
+      
+      if (!response.data.accessToken) {
+        // Automatically login after successful registration
+        return await login(userData.email, userData.password);
       }
+
+      setToken(accessToken);
+      setUser(userDto);
       
-      // Update profile state
-      setProfile(prev => ({
-        ...prev,
-        savedArticles: [...MOCK_USERS[user.id].savedArticles]
-      }));
-      
+      localStorage.setItem('token', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+
       return { success: true };
-    } catch (error) {
-      return { success: false, message: error.message };
     }
-  };
-  
-  // Remove a saved article
-  const removeSavedArticle = async (articleId) => {
-    if (!user || !token) {
-      return { success: false, message: 'Not authenticated' };
+    catch (error) {
+      console.error('Registration error:', error);
+      
+      // Get a more specific error message
+      const errorMessage = 
+        error.response?.data?.message || 
+        error.response?.data?.error || 
+        error.message || 
+        'Registration failed';
+        
+      setAuthError(errorMessage);
+      return { success: false, error: authError };
+    } finally {
+      setAuthLoading(false);
     }
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
+  }
+
+  const updateProfile = async (userData) => {
+    if(!token) return{ success: false, error: 'Not authenticated' };
+
+    setProfileLoading(true);
+    setProfileError(null);
+
     try {
-      // Remove article from user's saved articles
-      MOCK_USERS[user.id].savedArticles = MOCK_USERS[user.id].savedArticles
-        .filter(id => id !== articleId);
-      
-      // Update profile state
-      setProfile(prev => ({
-        ...prev,
-        savedArticles: [...MOCK_USERS[user.id].savedArticles]
-      }));
-      
-      return { success: true };
+      const response = await authService.updateUserProfile(userData);
+      setUser(response.data); // Update user state with new profile data
     } catch (error) {
-      return { success: false, message: error.message };
+      setProfileError(error.response.data.message || 'Failed to update profile');
+      return { success: false, error: profileError };
+    } finally {
+      setProfileLoading(false);
     }
-  };
+  }
+
+
 
   return {
     // Auth state and methods
@@ -293,15 +189,9 @@ export default function useProfiles() {
     register,
     
     // Profile state and methods
-    profile,
     profileLoading,
     profileError,
     fetchProfile,
     updateProfile,
-    
-    // Article methods
-    isArticleSaved,
-    saveArticle,
-    removeSavedArticle
   };
 }

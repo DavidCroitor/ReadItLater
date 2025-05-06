@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useArticles from "@/hooks/useArticles";
 import useCategories from "@/hooks/useCategories";
+import useProfiles from "@/hooks/useProfiles";
 import CategorySection from "@/components/categorySection";
 import ArticleSection from "@/components/articleSection";
 import ProfileSection from "@/components/profileSection";
@@ -37,6 +38,14 @@ export default function Home() {
     handleEditCategoryCancel
   } = useCategories();
 
+  const {
+    isAuthenticated,
+    user,
+    logout,
+    profileLoading
+  } = useProfiles();
+
+
   const toggleAddArticleDialog = () => {
     setIsAddArticleDialogOpen(!isAddArticleDialogOpen);
   };
@@ -48,7 +57,8 @@ export default function Home() {
   return (
     <div>
       <div className="containerWrapper">
-        <CategorySection  className="categoryContainer"
+
+        <CategorySection
           categories={categories}
           isAddCategoryDialogOpen={isAddCategoryDialogOpen}
           toggleAddCategoryDialog={toggleAddCategoryDialog}
@@ -67,9 +77,11 @@ export default function Home() {
           handleDeleteCategory={handleDeleteCategory}
           handleEditCategory={handleEditCategory}
           handleAddToCategory={handleAddToCategory}
+          isAuthenticated={isAuthenticated}
+          user={user}
         />
         
-        <ArticleSection className="articleContainer"
+        <ArticleSection
           articles={articles}
           isAddArticleDialogOpen={isAddArticleDialogOpen}
           toggleAddArticleDialog={toggleAddArticleDialog}
@@ -79,10 +91,18 @@ export default function Home() {
           handleRead={handleRead}
           handleFavorite={handleFavorite}
           handleCardClick={handleCardClick}
+          isAuthenticated={isAuthenticated}
+          user={user}
         />
         
-        <ProfileSection className="profileContainer"
+        <ProfileSection
+          isAuthenticated={isAuthenticated}
+          user={user}
+          logout={logout}
+          profileLoading={profileLoading}
          />
+
+
       </div>
     </div>
   );

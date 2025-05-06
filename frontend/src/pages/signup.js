@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import useProfiles from '@/hooks/useProfiles';
 
 export default function SignUp() {
-    const router = useRouter();
     const { register, authLoading, authError } = useProfiles();
     const [formData, setFormData] = useState({
         username: '',
@@ -13,6 +12,20 @@ export default function SignUp() {
         confirmPassword: ''
     });
     const [formError, setFormError] = useState('');
+
+    const router = useRouter();
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (!validateForm()) return;
+
+        const { success, error } = await register(formData);
+        if (success) {
+            router.push('/signin');
+        } else {
+            setFormError(error);
+        }
+    }
 
     const handleChange = (e) => {
         setFormData({
@@ -48,7 +61,9 @@ export default function SignUp() {
                 <h2>Sign Up</h2>
             </header>
         
-            <form className={styles.signInForm}>
+            <form className={styles.signInForm}
+                onSubmit={handleSubmit}
+            >
                 <div className={styles.formGroup}>
                     <label htmlFor="email">Email</label>
                     <input 
@@ -56,6 +71,7 @@ export default function SignUp() {
                         id="email" 
                         name="email" 
                         placeholder='Email'
+                        onChange={handleChange}
                         required/>
                 </div>
                 <div className={styles.formGroup}>
@@ -65,6 +81,7 @@ export default function SignUp() {
                         id="username" 
                         name="username" 
                         placeholder='Username'
+                        onChange={handleChange}
                         required/>
                 </div>
                 <div className={styles.formGroup}>
@@ -74,6 +91,7 @@ export default function SignUp() {
                         id="password"
                         name="password" 
                         placeholder='Password'
+                        onChange={handleChange}
                         required/>
                 </div><div className={styles.formGroup}>
                     <label htmlFor="password">Confirm Password</label>
@@ -82,6 +100,7 @@ export default function SignUp() {
                         id="confirmPassword"
                         name="confirmPassword" 
                         placeholder='Confirm Password'
+                        onChange={handleChange}
                         required/>
                 </div>
 

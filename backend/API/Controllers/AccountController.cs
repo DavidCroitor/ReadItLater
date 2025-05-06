@@ -46,14 +46,16 @@ public class AccountController : ControllerBase
                 registerUserDto.Username,
                 registerUserDto.Email
             );
+
             var createdUser = await _userManager.CreateAsync(user, registerUserDto.Password);
             if(createdUser.Succeeded)
             {
+                System.Console.WriteLine("User created successfully");
                 var roleResult = await _userManager.AddToRoleAsync(user, "User");
                 if(roleResult.Succeeded)
                 {
                     var token = _tokenService.CreateToken(user);
-
+                    Console.WriteLine(token);
                     return Ok(
                         new NewUserDto
                         {
@@ -65,11 +67,16 @@ public class AccountController : ControllerBase
                 }
                 else
                 {
+                    Console.WriteLine("Failed to add user to role");
                     return StatusCode(500, roleResult.Errors);
                 }
             }
             else
             {
+                foreach (var error in createdUser.Errors)
+                {
+                    Console.WriteLine(error.Description);
+                }
                 return StatusCode(500, createdUser.Errors);
             }
         }

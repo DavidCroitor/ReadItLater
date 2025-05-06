@@ -1,7 +1,6 @@
 import ArticleCard from "./articleCard";
 import AddArticleDialog from "./addArticleDialog";
-import useProfiles from "@/hooks/useProfiles";
-import styles from "../styles/articleSection.module.css";
+import styles from "../styles/sections.module.css";
 
 export default function ArticleSection({
   articles,
@@ -13,9 +12,9 @@ export default function ArticleSection({
   handleRead,
   handleFavorite,
   handleCardClick,
+  isAuthenticated,
+  user,
 }) {
-
-  const { isAuthenticated, user } = useProfiles();
 
   return (
     <div className={styles.articleContainer}>
@@ -25,7 +24,7 @@ export default function ArticleSection({
       </header>
 
       <div className={styles.addArticle}>
-        {isAuthenticated ? (
+        {isAuthenticated && user ? (
           <div className={styles.addArticle}>
             <button 
               onClick={toggleAddArticleDialog}
@@ -48,11 +47,11 @@ export default function ArticleSection({
       />
 
       <div className={styles.articleList}>
-        {isAuthenticated ? (
+        {isAuthenticated && user ? (
           articles.length > 0 ? (
             articles.map((article) => (
               <ArticleCard
-                key={article.id}
+                key={article.articleId}
                 article={article}
                 onDelete={handleDeleteArticle}
                 onAddToCategory={handleAddToCategory}

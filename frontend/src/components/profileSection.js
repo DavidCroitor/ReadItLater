@@ -1,10 +1,13 @@
 import { useRouter } from "next/router";
-import useProfiles from "@/hooks/useProfiles";
-import styles from "@/styles/profileSection.module.css";
+import styles from "../styles/sections.module.css";
 
-export default function ProfileSection() {
+export default function ProfileSection({
+  isAuthenticated,
+  user,
+  logout,
+  profileLoading,
+}) {
   const router = useRouter();
-  const { user, profile, isAuthenticated, logout, profileLoading } = useProfiles();
 
   const handleSignIn = () => {
     router.push("/signin");
@@ -20,10 +23,9 @@ export default function ProfileSection() {
         <h2>Profile</h2>
       </header>
 
-      {isAuthenticated ? (
+      {isAuthenticated && user ? (
         <div className={styles.profileInfo}>
           <h3>{user.username}</h3>
-          {profile?.bio && <p className={styles.bio}>{profile.bio}</p>}
           <p className={styles.email}>{user.email}</p>
           <button 
             className={styles.logoutButton} 

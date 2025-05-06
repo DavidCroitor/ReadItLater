@@ -15,17 +15,21 @@ public static class CorsExtensions
             this IServiceCollection services,
             IConfiguration configuration)
         {
-            var allowedOriginsConfig = configuration.GetValue<string>(CorsAllowedOriginsKey);
-            string[] origins = Array.Empty<string>();
+           var origins = new List<string>();
 
+            var allowedOriginsConfig = configuration.GetValue<string>(CorsAllowedOriginsKey);
             if (!string.IsNullOrWhiteSpace(allowedOriginsConfig))
             {
-                origins = allowedOriginsConfig.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                origins.AddRange(allowedOriginsConfig.Split(',', 
+                    StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
             }
-            else
+            
+            // Always include localhost:3000 for development
+            if (!origins.Contains("http://localhost:3000"))
             {
-                Console.WriteLine($"Warning: CORS AllowedOrigins ('{CorsAllowedOriginsKey}') not found or empty in configuration. No origins will be explicitly allowed by default policy.");
-         }
+                origins.Add("http://localhost:3000");
+                Console.WriteLine("Added http://localhost:3000 to CORS allowed origins");
+            }
 
 
             services.AddCors(options =>
@@ -35,7 +39,10 @@ public static class CorsExtensions
                                   {
                                       if (origins.Any())
                                       {
-                                          policy.WithOrigins(origins); // Allow specific origins
+                                          policy.WithOrigins(origins.ToArray())
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
                                       }
                                       else
                                       {

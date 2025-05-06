@@ -3,7 +3,7 @@ import styles from '../styles/addArticleDialog.module.css';
 
 export default function AddArticleDialog({ isOpen, onAdd, onClose }) {
 
-    const [newArticle, setNewArticle] = useState({ title: '', url: '' });
+    const [newArticle, setNewArticle] = useState({ url: '' });
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -15,7 +15,7 @@ export default function AddArticleDialog({ isOpen, onAdd, onClose }) {
             isFavorite: false,
         })
 
-        setNewArticle({ title: '', url: '' });
+        setNewArticle({ url: '' });
     }
 
     if (!isOpen) return null;
@@ -25,16 +25,6 @@ export default function AddArticleDialog({ isOpen, onAdd, onClose }) {
             <div className={styles.dialogContent}>
                 <h2>Add New Article</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="title">Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            value={newArticle.title}
-                            onChange={(e) => setNewArticle({ ...newArticle, title: e.target.value })}
-                            required
-                        />
-                    </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="url">URL</label>
                         <input

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import useArticles from '@/hooks/useArticles';
+import useArticleDetails from '@/hooks/useArticleDetails';
 import styles from '@/styles/articlePage.module.css';
 import ReactMarkdown from 'react-markdown';
 
@@ -8,21 +8,29 @@ import ReactMarkdown from 'react-markdown';
 export default function ArticlePage() {
     const router = useRouter();
     const { id } = router.query; // Extract the article ID from the URL
-    const { articles, handleFavorite, handleRead } = useArticles(); // Fetch articles using the custom hook
-    const [article, setArticle] = useState(null);
+    const { article, loading, error } = useArticleDetails(id); // Fetch articles using the custom hook
 
-    useEffect(() => {
-        if (id && articles) {
-            const parsedId = parseInt(id, 10); // Parse the ID to an integer
-            const foundArticle = articles.find(article => article.id === parsedId);
-            setArticle(foundArticle);
-        }
-    }, [id, articles]);
+    if(loading) {
+        return (
+            <div className={styles.articlePageContainer}>
+                <p>Loading article...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className={styles.articlePageContainer}>
+                <p>Error loading article: {error}</p>
+            </div>
+        );
+    }
+
 
     if (!article) {
         return (
             <div className={styles.articlePageContainer}>
-                <p>Loading article...</p>
+                <p>Article not found</p>
             </div>
         );
     }
@@ -31,6 +39,16 @@ export default function ArticlePage() {
         <div className={styles.articlePageContainer}>
             <header className={styles.articleHeader}>
                 <h2>{article.title}</h2>
+                <div className={styles.indicators}>
+                    {article.isRead && <span className={styles.readIndicator} title="Read">✓</span>}
+                    {article.isFavourite && <span className={styles.favoriteIndicator} title="Favorite">⭐</span>}
+                </div>
+                <p className={styles.articleDate}>Saved on: {new Date(article.savedAt).toLocaleDateString("en-UK", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                })}</p>
+                <a className={styles.articleSource} href={article.url}>{article.url}</a>
             </header>
             <div className={styles.articleContent}>
                 <ReactMarkdown 

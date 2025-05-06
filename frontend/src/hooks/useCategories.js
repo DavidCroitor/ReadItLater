@@ -1,17 +1,53 @@
 import { useState, useEffect } from "react";
+import useProfiles from "./useProfiles";
+
+const MOCK_CATEGORIES = [
+    { id: 1, userId:"user1", name: "Frontend" },
+    { id: 2, userId:"user1", name: "Backend" },
+    { id: 3, userId:"user2", name: "Design" },
+];
 
 export default function useCategories() {
-    // Mock category data
-    const [categories, setCategories] = useState([
-    { id: 1, name: "Frontend" },
-    { id: 2, name: "Backend" },
-    { id: 3, name: "Design" },
-    ]);
-
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState("");
     const [editingCategoryId, setEditingCategoryId] = useState(null);
     const [editCategoryName, setEditCategoryName] = useState("");
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [categories, setCategories] = useState([]);
+
+    const { user, isAuthenticated } = useProfiles();
+
+    useEffect(() => {
+        fetchCategories();
+    }, [user])
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        setError(null);
+
+        try {
+          // Filter articles by user ID if authenticated
+          let userCategories = [];
+          
+          if (isAuthenticated && user?.id) {
+            console.log("Fetching categories for user:", user.id);
+            userCategories = MOCK_CATEGORIES.filter(article => article.userId === user.id);
+          } else {
+            // If not authenticated, return empty array
+            userCategories = [];
+          }
+          
+          setCategories(userCategories);
+        } catch (err) {
+          console.error("Error fetching articles:", err);
+          setError("Failed to load articles. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+    };
 
     const handleAddCategory = (newCategory) => {
         console.log(`Adding new category: ${JSON.stringify(newCategory)}`);
@@ -27,7 +63,7 @@ export default function useCategories() {
       }
     
       const handleAddInlineCategory = () => {
-        setIsCreatingCategory(true);
+        setIsCreatingCategory(!isCreatingCategory);
       };
       
       const handleCategoryNameSubmit = (e) => {
