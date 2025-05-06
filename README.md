@@ -49,5 +49,5 @@ The project follows a clean architecture pattern with the following components:
 
 - Save articles for later reading
 - Organize articles by categories
-- Mark articles as read/unread
+- Mark articles as read/favorite
 
